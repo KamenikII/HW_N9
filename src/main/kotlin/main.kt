@@ -27,7 +27,6 @@ object ChatService {
             chats.remove(userId)
             return true
         } else throw ChatNotFoundException()
-        return false
     }
 }
 
