@@ -1,3 +1,5 @@
+import ChatNotFoundException
+
 data class Chat(val messages: MutableList<Message> = mutableListOf())
 data class Message(val content: String, var read: Boolean = false)
 
@@ -13,9 +15,15 @@ object ChatService {
         return true
     }
 
-    fun getMessages(userId: Int, n: Int): List<Message> {
-        val chat = chats[userId] ?: throw ChatNotFoundException()
-        return chat.messages.takeLast(n).onEach {it.read = true}
+    fun getMessages(userId: Int, startFrom: Int): List<Message> {
+//        val chat = chats[userId] ?: throw ChatNotFoundException()
+//        return chat.messages.takeLast(n).onEach {it.read = true}
+        chats.singleOrNull { it.id == chatId}
+            .let { it?.messages ?: throw ChatNotFoundException() }
+            .asSequence()
+            .drop(startFrom)
+            .ifEmpty { throw MessageNotFoundException() }
+            .toList()
     }
 
     fun countUnread(): Int {
@@ -31,3 +39,4 @@ object ChatService {
 }
 
 class ChatNotFoundException: Throwable() {}
+class MessageNotFoundException: Throwable() {}
